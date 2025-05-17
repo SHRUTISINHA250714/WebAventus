@@ -3,51 +3,57 @@
 import { useState, useEffect } from "react";
 import { Incident } from "@/types/incident";
 
-const mockIncidents: Incident[] = [
-  {
-    id: "1",
-    title: "Flash Flooding on Main Street",
-    description: "Several blocks of Main Street are underwater. Cars are stranded and water level is rising. Local businesses affected.",
-    location: "Main Street & 5th Avenue",
-    imageUrl: "https://images.pexels.com/photos/1756959/pexels-photo-1756959.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    timestamp: "2023-07-15T14:32:00Z",
-    reportedBy: "John Doe",
-  },
-  {
-    id: "2",
-    title: "Building Fire in Downtown Area",
-    description: "Three-story building on fire. Fire department is on scene. Surrounding buildings are being evacuated as a precaution.",
-    location: "123 Center Street",
-    imageUrl: "https://images.pexels.com/photos/51951/forest-fire-fire-smoke-conservation-51951.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    timestamp: "2023-07-14T19:15:00Z",
-    reportedBy: "Jane Smith",
-  },
-  {
-    id: "3",
-    title: "Power Outage in North District",
-    description: "Widespread power outage affecting approximately 500 homes. Utility company has been notified and is working on repairs.",
-    location: "North District",
-    imageUrl: "https://images.pexels.com/photos/775313/pexels-photo-775313.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    timestamp: "2023-07-13T22:45:00Z",
-    reportedBy: "Michael Johnson",
-  },
-];
-
 export function useIncidents() {
-  const [incidents, setIncidents] = useState<Incident[]>(mockIncidents);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addIncident = async (incident: Omit<Incident, "id">) => {
-    const newIncident: Incident = {
-      ...incident,
-      id: Date.now().toString(),
+  useEffect(() => {
+    const fetchIncidents = async () => {
+      try {
+        const response = await fetch("/api/incidents");
+        if (!response.ok) {
+          throw new Error("Failed to fetch incidents");
+        }
+        const data = await response.json();
+        setIncidents(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setIncidents((prevIncidents) => [newIncident, ...prevIncidents]);
-    return newIncident;
+    fetchIncidents();
+  }, []);
+
+  const addIncident = async (incident: Omit<Incident, "id">) => {
+    try {
+      const response = await fetch("/api/incidents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(incident),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create incident");
+      }
+
+      const newIncident = await response.json();
+      setIncidents((prevIncidents) => [newIncident, ...prevIncidents]);
+      return newIncident;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      throw err;
+    }
   };
 
   return {
     incidents,
+    loading,
+    error,
     addIncident,
   };
 }

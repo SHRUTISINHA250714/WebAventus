@@ -33,19 +33,43 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { FamilyContact } from "@/types/contacts";
 
 export default function FamilyContactsPage() {
-  const { familyContacts, addFamilyContact, removeFamilyContact } = useEmergencyContacts();
+  const {
+    familyContacts,
+    addFamilyContact,
+    removeFamilyContact,
+    updateFamilyContact,
+  } = useEmergencyContacts();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<string | null>(null);
-  
+  const [editingContact, setEditingContact] = useState<
+    FamilyContact | undefined
+  >();
+
   const handleDeleteContact = () => {
     if (contactToDelete) {
       removeFamilyContact(contactToDelete);
       setContactToDelete(null);
     }
   };
-  
+
+  const handleEditContact = (contact: FamilyContact) => {
+    setEditingContact(contact);
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveContact = (contact: Omit<FamilyContact, "id">) => {
+    if (editingContact) {
+      updateFamilyContact(editingContact.id, contact);
+      setEditingContact(undefined);
+    } else {
+      addFamilyContact(contact);
+    }
+    setIsDialogOpen(false);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex items-center justify-between mb-6">
@@ -58,12 +82,14 @@ export default function FamilyContactsPage() {
           Add Contact
         </Button>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Family & Personal Contacts</CardTitle>
           <CardDescription>
-            Manage contacts for your family members and close ones. In an emergency, these will be automatically notified when you use the SOS button.
+            Manage contacts for your family members and close ones. In an
+            emergency, these will be automatically notified when you use the SOS
+            button.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,7 +106,9 @@ export default function FamilyContactsPage() {
               <TableBody>
                 {familyContacts.map((contact) => (
                   <TableRow key={contact.id}>
-                    <TableCell className="font-medium">{contact.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {contact.name}
+                    </TableCell>
                     <TableCell>
                       <div className="capitalize">{contact.relationship}</div>
                     </TableCell>
@@ -94,10 +122,20 @@ export default function FamilyContactsPage() {
                       </a>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleEditContact(contact)}
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <AlertDialog open={contactToDelete === contact.id} onOpenChange={(open) => !open && setContactToDelete(null)}>
+                      <AlertDialog
+                        open={contactToDelete === contact.id}
+                        onOpenChange={(open) =>
+                          !open && setContactToDelete(null)
+                        }
+                      >
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="ghost"
@@ -112,12 +150,17 @@ export default function FamilyContactsPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Remove Contact</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to remove {contact.name} from your emergency contacts? They will no longer be notified when you use the SOS feature.
+                              Are you sure you want to remove {contact.name}{" "}
+                              from your emergency contacts? They will no longer
+                              be notified when you use the SOS feature.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDeleteContact}>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={handleDeleteContact}
+                            >
                               Remove
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -131,9 +174,12 @@ export default function FamilyContactsPage() {
           ) : (
             <div className="text-center py-10">
               <Users className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-              <h3 className="text-lg font-medium mb-1">No family contacts added</h3>
+              <h3 className="text-lg font-medium mb-1">
+                No family contacts added
+              </h3>
               <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                Add family members or personal contacts that should be notified in case of an emergency.
+                Add family members or personal contacts that should be notified
+                in case of an emergency.
               </p>
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -145,7 +191,8 @@ export default function FamilyContactsPage() {
         {familyContacts.length > 0 && (
           <CardFooter className="border-t pt-6">
             <p className="text-sm text-muted-foreground mr-auto">
-              These contacts will be automatically called and messaged when you activate the SOS feature.
+              These contacts will be automatically called and messaged when you
+              activate the SOS feature.
             </p>
             <Button onClick={() => setIsDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -154,11 +201,15 @@ export default function FamilyContactsPage() {
           </CardFooter>
         )}
       </Card>
-      
-      <ContactDialog 
-        open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
-        onSave={addFamilyContact}
+
+      <ContactDialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditingContact(undefined);
+        }}
+        onSave={handleSaveContact}
+        editingContact={editingContact}
       />
     </DashboardLayout>
   );

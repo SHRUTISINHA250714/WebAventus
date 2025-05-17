@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { OfficialContact, FamilyContact } from "@/types/contacts";
 
+const STORAGE_KEY = "familyContacts";
+
 const mockOfficialContacts: OfficialContact[] = [
   {
     id: "1",
@@ -46,27 +48,36 @@ const mockFamilyContacts: FamilyContact[] = [
 ];
 
 export function useEmergencyContacts() {
-  const [officialContacts, setOfficialContacts] = useState<OfficialContact[]>(mockOfficialContacts);
-  const [familyContacts, setFamilyContacts] = useState<FamilyContact[]>([]);
-
-  // Simulate loading from localStorage
-  useEffect(() => {
-    const storedContacts = localStorage.getItem("familyContacts");
-    if (storedContacts) {
-      try {
-        setFamilyContacts(JSON.parse(storedContacts));
-      } catch (e) {
-        console.error("Failed to parse stored contacts", e);
-        setFamilyContacts(mockFamilyContacts);
+  // Initialize with mock data
+  const [officialContacts] = useState<OfficialContact[]>(mockOfficialContacts);
+  const [familyContacts, setFamilyContacts] = useState<FamilyContact[]>(() => {
+    // Initialize from localStorage or mock data
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error("Error parsing stored contacts:", e);
+          return mockFamilyContacts;
+        }
       }
-    } else {
-      setFamilyContacts(mockFamilyContacts);
+      // If no stored data, save mock data to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockFamilyContacts));
+      return mockFamilyContacts;
     }
-  }, []);
+    return mockFamilyContacts;
+  });
 
-  // Save to localStorage when contacts change
+  // Save to localStorage whenever contacts change
   useEffect(() => {
-    localStorage.setItem("familyContacts", JSON.stringify(familyContacts));
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(familyContacts));
+      } catch (error) {
+        console.error("Error saving contacts to localStorage:", error);
+      }
+    }
   }, [familyContacts]);
 
   const addFamilyContact = (contact: Omit<FamilyContact, "id">) => {
@@ -81,10 +92,22 @@ export function useEmergencyContacts() {
     setFamilyContacts((prev) => prev.filter((contact) => contact.id !== id));
   };
 
+  const updateFamilyContact = (
+    id: string,
+    updatedContact: Partial<FamilyContact>
+  ) => {
+    setFamilyContacts((prev) =>
+      prev.map((contact) =>
+        contact.id === id ? { ...contact, ...updatedContact } : contact
+      )
+    );
+  };
+
   return {
     officialContacts,
     familyContacts,
     addFamilyContact,
     removeFamilyContact,
+    updateFamilyContact,
   };
 }

@@ -16,19 +16,23 @@ export default function IncidentReporting() {
   const { toast } = useToast();
   const router = useRouter();
   const { addIncident } = useIncidents();
-  const { location, loading: locationLoading, error: locationError } = useGeolocation();
-  
+  const {
+    location,
+    loading: locationLoading,
+    error: locationError,
+  } = useGeolocation();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedImage(file);
-      
+
       // Create image preview
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -37,10 +41,10 @@ export default function IncidentReporting() {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title.trim()) {
       toast({
         title: "Title Required",
@@ -49,28 +53,40 @@ export default function IncidentReporting() {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      // In a real app, we would upload the image to a server/storage service
-      // and get back a URL. For this demo, we'll use the image preview URL directly.
-      const imageUrl = imagePreview;
-      
-      await addIncident({
-        title,
-        description,
-        imageUrl,
-        location: location ? `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}` : "Unknown location",
-        timestamp: new Date().toISOString(),
-        reportedBy: "Current User", // Would come from auth in a real app
+      const imageUrl = imagePreview || undefined;
+
+      const response = await fetch("/api/incidents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          imageUrl,
+          location: location
+            ? `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(
+                4
+              )}`
+            : "0, 0",
+          timestamp: new Date().toISOString(),
+          reportedBy: "Anonymous", // Would come from auth in a real app
+        }),
       });
-      
+
+      if (!response.ok) {
+        throw new Error("Failed to submit incident");
+      }
+
       toast({
         title: "Incident Reported",
         description: "Your incident has been successfully reported.",
       });
-      
+
       // Navigate back to the dashboard
       router.push("/");
     } catch (error) {
@@ -83,7 +99,7 @@ export default function IncidentReporting() {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <DashboardLayout>
       <div className="max-w-2xl mx-auto">
@@ -91,7 +107,7 @@ export default function IncidentReporting() {
           <AlertTriangle className="h-6 w-6 mr-2 text-destructive" />
           <h1 className="text-2xl font-bold">Report an Incident</h1>
         </div>
-        
+
         <div className="bg-card rounded-lg shadow-md p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -104,7 +120,7 @@ export default function IncidentReporting() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="description">Incident Description</Label>
               <Textarea
@@ -115,7 +131,7 @@ export default function IncidentReporting() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label>Incident Photo</Label>
               <div className="border-2 border-dashed border-border rounded-md p-4 text-center">
@@ -166,7 +182,7 @@ export default function IncidentReporting() {
                 )}
               </div>
             </div>
-            
+
             <div>
               <div className="flex items-center mb-2">
                 <MapPin className="h-4 w-4 mr-1" />
@@ -187,7 +203,7 @@ export default function IncidentReporting() {
                 )}
               </div>
             </div>
-            
+
             <div className="pt-4 border-t border-border flex gap-3 justify-end">
               <Button
                 type="button"
@@ -196,10 +212,7 @@ export default function IncidentReporting() {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || !title.trim()}
-              >
+              <Button type="submit" disabled={isSubmitting || !title.trim()}>
                 {isSubmitting ? "Submitting..." : "Submit Report"}
               </Button>
             </div>
