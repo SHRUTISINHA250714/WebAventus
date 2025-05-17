@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, AlertTriangle, MessageSquare, PhoneCall, 
-  CheckSquare, BookOpen, HelpCircle, Settings, 
-  Users, Star
+import {
+  Home,
+  AlertTriangle,
+  MessageSquare,
+  PhoneCall,
+  CheckSquare,
+  BookOpen,
+  HelpCircle,
+  Settings,
+  Users,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +23,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, className }: SidebarProps) {
   const pathname = usePathname();
-  
+
   return (
     <aside
       id="sidebar"
@@ -32,7 +39,7 @@ export function Sidebar({ isOpen, className }: SidebarProps) {
           <h1 className="font-bold text-lg">Emergency Response</h1>
         </div>
       </div>
-      
+
       <nav className="p-2">
         <ul className="space-y-1">
           <li>
@@ -105,7 +112,7 @@ export function Sidebar({ isOpen, className }: SidebarProps) {
               Preparedness Checklist
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               href="/knowledge-base"
               className={cn(
@@ -118,7 +125,7 @@ export function Sidebar({ isOpen, className }: SidebarProps) {
               <BookOpen className="h-4 w-4" />
               Knowledge Base
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               href="/family-contacts"
@@ -134,7 +141,7 @@ export function Sidebar({ isOpen, className }: SidebarProps) {
             </Link>
           </li>
         </ul>
-        
+
         <div className="mt-6 pt-4 border-t border-border">
           <ul className="space-y-1">
             <li>

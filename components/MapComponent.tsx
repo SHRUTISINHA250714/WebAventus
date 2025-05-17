@@ -270,7 +270,7 @@ const MapComponent: React.FC = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Enter your distress message..."
-              className="w-full md:w-2/3 h-10 p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white/80 backdrop-blur-sm"
+              className="w-full md:w-2/3 h-10 p-2 border text-black border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white/80 backdrop-blur-sm"
             />
             <button
               onClick={sendDistressSignal}

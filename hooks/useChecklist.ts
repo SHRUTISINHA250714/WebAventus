@@ -1,53 +1,80 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, FC } from "react";
 import { ChecklistCategory, ChecklistItem } from "@/types/checklist";
-import { Droplets, Pill, Salad, Flashlight, BookMarked, Home, Shield } from "lucide-react";
+import {
+  FaTint,
+  FaUtensils,
+  FaMedkit,
+  FaTools,
+  FaIdCard,
+  FaHome,
+  FaShieldAlt,
+} from "react-icons/fa";
+import { IconType } from "react-icons";
 
+// Store the icon type rather than the rendered element
 const mockCategories: ChecklistCategory[] = [
   {
     id: "water",
     name: "Water",
     description: "Water supplies for drinking and sanitation",
-    icon: <Droplets className="h-4 w-4" />,
+    iconName: "FaTint",
   },
   {
     id: "food",
     name: "Food",
     description: "Non-perishable food supplies",
-    icon: <Salad className="h-4 w-4" />,
+    iconName: "FaUtensils",
   },
   {
     id: "medical",
     name: "Medical",
     description: "First aid supplies and medications",
-    icon: <Pill className="h-4 w-4" />,
+    iconName: "FaMedkit",
   },
   {
     id: "tools",
     name: "Tools & Supplies",
     description: "Equipment and tools for emergencies",
-    icon: <Flashlight className="h-4 w-4" />,
+    iconName: "FaTools",
   },
   {
     id: "documents",
     name: "Documents",
     description: "Important documents and information",
-    icon: <BookMarked className="h-4 w-4" />,
+    iconName: "FaIdCard",
   },
   {
     id: "shelter",
     name: "Shelter",
     description: "Shelter and warmth items",
-    icon: <Home className="h-4 w-4" />,
+    iconName: "FaHome",
   },
   {
     id: "safety",
     name: "Safety",
     description: "Safety and protection items",
-    icon: <Shield className="h-4 w-4" />,
+    iconName: "FaShieldAlt",
   },
 ];
+
+// Map for looking up icon components by name
+const iconMap: Record<string, IconType> = {
+  FaTint,
+  FaUtensils,
+  FaMedkit,
+  FaTools,
+  FaIdCard,
+  FaHome,
+  FaShieldAlt,
+};
+
+// Helper function to render an icon from the icon name
+// export function renderCategoryIcon(iconName: string): JSX.Element {
+//   const IconComponent = iconMap[iconName];
+//   return IconComponent ? <IconComponent className="h-4 w-4" /> : <></>;
+// }
 
 const mockItems: ChecklistItem[] = [
   {
@@ -132,7 +159,8 @@ const mockItems: ChecklistItem[] = [
     id: "medical-4",
     categoryId: "medical",
     name: "Medical Equipment",
-    description: "Any necessary equipment like inhalers, glucose monitors, etc.",
+    description:
+      "Any necessary equipment like inhalers, glucose monitors, etc.",
     checked: false,
   },
   {
@@ -247,7 +275,16 @@ export function useChecklist() {
   const [categories] = useState<ChecklistCategory[]>(mockCategories);
   const [items, setItems] = useState<ChecklistItem[]>(mockItems);
 
-  // Load saved progress from localStorage
+  // Load saved checklist from localStorage when component mounts
+  useEffect(() => {
+    loadProgress();
+  }, []);
+
+  // Save changes to localStorage whenever items change
+  useEffect(() => {
+    saveProgress();
+  }, [items]);
+
   const loadProgress = useCallback(() => {
     const savedItems = localStorage.getItem("checklist");
     if (savedItems) {
@@ -259,12 +296,10 @@ export function useChecklist() {
     }
   }, []);
 
-  // Save progress to localStorage
   const saveProgress = useCallback(() => {
     localStorage.setItem("checklist", JSON.stringify(items));
   }, [items]);
 
-  // Toggle item checked status
   const toggleItem = (itemId: string) => {
     setItems((prevItems) =>
       prevItems.map((item) =>
@@ -279,5 +314,6 @@ export function useChecklist() {
     toggleItem,
     saveProgress,
     loadProgress,
+    // renderCategoryIcon,
   };
 }
