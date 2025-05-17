@@ -1,0 +1,12 @@
+langchain
+langchain_google_genai
+fastapi
+uvicorn
+python-dotenv
+cors
+chromadb
+unstructured
+langchain_community
+sentence-transformers
+mediapipe
+opencv-python
