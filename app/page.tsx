@@ -19,13 +19,15 @@ export default function Home() {
   return (
     <LanguageProvider>
       <DashboardLayout>
-        {alerts.length > 0 && <AlertBanner alerts={alerts} />}
+        {/* {alerts.length > 0 && <AlertBanner alerts={alerts} />} */}
 
         {/* Desktop Layout */}
         <div className="hidden md:block">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Disaster Management System</h1>
-            <SOSButton />
+            <div className="pr-[170px]">
+              <SOSButton />
+            </div>
           </div>
           <div>
             <MapComponent />
@@ -81,7 +83,9 @@ export default function Home() {
         <div className="md:hidden">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-xl font-bold">Disaster Management</h1>
-            <SOSButton />
+            <div className="pr-4">
+              <SOSButton />
+            </div>
           </div>
 
           <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
