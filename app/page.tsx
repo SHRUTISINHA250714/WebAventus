@@ -11,6 +11,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { MobileTabs } from "@/components/layout/MobileTabs";
 import MapComponent from "@/components/MapComponent";
 
+import GestureDetector from "@/app/handgesture/page";
 export default function Home() {
   const { alerts } = useAlerts();
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -62,6 +63,10 @@ export default function Home() {
                       View Knowledge Base →
                     </a>
                   </div>
+                  <h1 className="text-2xl font-bold mb-4">
+                    Disaster Gesture Detection
+                  </h1>
+                  <GestureDetector />
                 </div>
               </div>
             </div>
