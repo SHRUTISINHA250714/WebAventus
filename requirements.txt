@@ -6,6 +6,7 @@ python-dotenv
 cors
 chromadb
 unstructured
-pypdf
 langchain_community
 sentence-transformers
+mediapipe
+opencv-python
