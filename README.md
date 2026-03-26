@@ -3,7 +3,7 @@
 AI-powered disaster response and survival assistant.
 
 ## Problem Statement
-Amidst a disaster or a conflict, internet and power outages often isolate communities from life-saving information and assistance. People can be trapped in dangerous situations without real-time guidance, first aid instructions, or survival strategies—especially in rural, remote, or infrastructure-compromised areas. In such moments, delays can become the difference between life and death.
+Amidst a disaster or a conflict, internet and power outages often isolate communities from life-saving information and assistance. People can be trapped in dangerous situations without real-time guidance, first aid instructions, or survival strategies-especially in rural, remote, or infrastructure-compromised areas. In such moments, delays can become the difference between life and death.
 
 ## Solution
 **Silent Signals** is an AI-powered survival partner for crisis situations like earthquakes, floods, and fires. It provides clear, step-by-step guidance using voice and text input, supports multiple languages, and includes gesture-based alerts for accessibility (including injured or non-verbal users).
@@ -54,7 +54,7 @@ This repository currently contains:
 - **Gesture Backend:** FastAPI + OpenCV + MediaPipe (`backend/main.py`)
 
 ## Additional App Details (Reference)
-Additional product details are in: `https://github.com/kamini08/silentSignals`
+Additional app version of source code is in: [LINK](https://github.com/BhoomiAgrawal12/silentSignals)
 
 Key capabilities represented there include:
 - **Dual experience flows:** `I Need Help` and `I'm a Responder` journeys.
